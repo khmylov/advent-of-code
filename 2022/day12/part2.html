@@ -75,10 +75,17 @@ abaaaacaaaaaaaacccccccccccccaacaaccccccaaaaccccccccccccccccccccccccaaaaaaaaaaacc
     const START = input.indexOf('S');
     const DESTINATION = input.indexOf('E');
 
-    const queue = [START];
-    state[START] = 0;
+    const queue = [DESTINATION];
+    state[DESTINATION] = 0;
 
     const to2D = index => [Math.floor(index / WIDTH), index % WIDTH];
+
+    const targetIndices = [];
+    for (let i = 0; i < input.length; i++) {
+      if (input[i] === 'a' || input[i] === 'S') {
+        targetIndices.push(i);
+      }
+    }
 
     run();
 
@@ -97,7 +104,7 @@ abaaaacaaaaaaaacccccccccccccaacaaccccccaaaaccccccccccccccccccccccccaaaaaaaaaaacc
           const neighbours = buildNeighbours(currentIndex);
 
           for (const index of neighbours) {
-            if (getElevation(index).charCodeAt(0) <= currentElevation.charCodeAt(0) + 1) {
+            if (getElevation(index).charCodeAt(0) + 1 >= currentElevation.charCodeAt(0)) {
               const nState = state[index];
               if (nState === -1 || nState > currentSteps + 1) {
                 state[index] = currentSteps + 1;
@@ -127,20 +134,6 @@ abaaaacaaaaaaaacccccccccccccaacaaccccccaaaaccccccccccccccccccccccccaaaaaaaaaaacc
           .map(([y, x]) => y * WIDTH + x);
     }
 
-    function buildPath() {
-      if (state[DESTINATION] < 0) {
-        return [];
-      }
-
-      const result = [DESTINATION];
-      while (result[0] !== START) {
-        const current = result[0];
-        result.unshift(buildNeighbours(result[0]).find(i => state[i] === state[current] - 1));
-      }
-
-      return result;
-    }
-
     function update() {
       if (!queue.length) {
         return;
@@ -166,17 +159,9 @@ abaaaacaaaaaaaacccccccccccccaacaaccccccaaaaccccccccccccccccccccccccaaaaaaaaaaacc
       ctx.fillStyle = '#0f0';
       drawRect(DESTINATION);
 
-      const path = buildPath();
-      if (path.length) {
-        ctx.fillStyle = '#00f';
-        for (const index of path) {
-          drawRect(index);
-        }
-      }
-
-      // 517
+      // 512
       statusOutput.innerHTML = [
-        `target: ${state[DESTINATION]}`,
+        `targets: ${targetIndices.map(i => state[i]).filter(x => x >= 0).reduce((a, b) => a < b ? a : b, 9999999)}`,
         `queue length: ${queue.length}`,
         `visited: ${visited.size}`,
         `current length: ${state[queue[queue.length - 1]]}`
