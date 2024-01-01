@@ -1,5 +1,4 @@
 import pathlib
-from pydoc import doc
 import re
 from collections import namedtuple
 
