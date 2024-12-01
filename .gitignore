@@ -7,5 +7,7 @@
 **/.idea/contentModel.xml
 **/.idea/config/applicationhost.config
 
+*.DotSettings.user
+
 .fake
 .ionide
